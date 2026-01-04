@@ -134,13 +134,66 @@
 
 ### 🚛 Collector Screens
 
-| Collector Dashboard | Pickup Management | Pickup Details |
-|:---:|:---:|:---:|
-| <img src="screenshots/collector/home.png" width="200"> | <img src="screenshots/collector/pickups.png" width="200"> | <img src="screenshots/collector/detail.png" width="200"> |
+#### Dashboard & Workflow
 
-| Navigation Map | Notifications | Settings |
+| Collector Dashboard | Settings | Help & Support |
 |:---:|:---:|:---:|
-| <img src="screenshots/collector/map.png" width="200"> | <img src="screenshots/collector/notifications.png" width="200"> | <img src="screenshots/collector/settings.png" width="200"> |
+| ![Collector Dashboard](screenshots/collector/collector_dashboard.png) | ![Collector Settings](screenshots/collector/collector_settings.png) | ![Help Support](screenshots/collector/help_support.png) |
+| *Sanjay Raam's dashboard with 0 pending, 0 today's pickups, 3 completed. Status workflow: Assigned → Confirmed → In Progress → Completed* | *Profile (rajaswamy2005@gmail.com), Collector badge, Dark Mode, Push Notifications (on), Location Access (on), Help & About* | *Quick Contact: Call (+91 8148155805), Email (support@smartwaste.com), Live Chat. FAQs about scheduling, waste types, tracking, cancellation, time slots* |
+
+#### AI Assistant
+
+| EcoBot Chat |
+|:---:|
+| ![EcoBot](screenshots/collector/ecobot_chat.png) |
+| *AI chatbot assistant "EcoBot" (Online) offering help with scheduling pickups, tracking requests, eco points & rewards, waste types & recycling, and account issues. Quick actions: Schedule pickup, Track order, Eco points, Contact support* |
+
+---
+
+#### 🚛 Collector Features Highlighted
+
+**Dashboard Overview**
+- 📊 **Real-time Stats** - Live pickup counters (Pending & Today's Pickups)
+- 🔔 **Notifications** - Badge showing 2 new notifications
+- 📈 **Performance Metrics** - 4 status categories with counts
+  - Assigned: 0 (Awaiting confirmation)
+  - Confirmed: 0 (Ready for pickup)
+  - In Progress: 0 (On the way)
+  - Completed: 3 (Successfully collected)
+- 📋 **Status Tabs** - Filter pickups by workflow stage
+- 📦 **Empty State** - Clear "No assigned pickups" message
+
+**Settings & Preferences**
+- 👤 **Collector Profile** - Name, email, and role badge
+- 🌙 **Dark Mode** - Theme customization
+- 🔔 **Push Notifications** - Receive pickup updates (enabled)
+- 📍 **Location Access** - For navigation and tracking (enabled)
+- 🆘 **Support Access** - Help & Support and About sections
+- 🚪 **Logout** - Secure sign out
+
+**Help & Support System**
+- 📞 **Multiple Contact Methods**:
+  - Call: +91 8148155805
+  - Email: support@smartwaste.com
+  - Live Chat with support team
+- ❓ **Comprehensive FAQs**:
+  - How to schedule a pickup
+  - Waste collection types
+  - Pickup tracking methods
+  - Cancellation policies
+  - Available time slots
+
+**EcoBot AI Assistant** 🤖
+- 💬 **Interactive Chat** - AI-powered conversational interface
+- 🟢 **Online Status** - Real-time availability indicator
+- 📋 **Capabilities**:
+  - Scheduling pickups
+  - Tracking requests
+  - Eco Points & rewards information
+  - Waste types & recycling guidance
+  - Account issue resolution
+- ⚡ **Quick Actions** - One-tap buttons for common tasks
+- 💬 **Message Input** - Type custom queries
 
 ---
 
