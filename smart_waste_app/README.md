@@ -80,21 +80,32 @@
 
 ### 👤 User Screens
 
-| Home Dashboard | Request Pickup | Location Picker |
-|:---:|:---:|:---:|
-| <img src="screenshots/user/home.png" width="200"> | <img src="screenshots/user/request_pickup.png" width="200"> | <img src="screenshots/user/location_picker.png" width="200"> |
+#### Main Features
 
-| Pickup History | Pickup Details | Track Pickup |
+| Home Dashboard | Request Pickup | Profile |
 |:---:|:---:|:---:|
-| <img src="screenshots/user/history.png" width="200"> | <img src="screenshots/user/pickup_detail.png" width="200"> | <img src="screenshots/user/track.png" width="200"> |
+| ![Home](screenshots/user/home.png) | ![Request Pickup](screenshots/user/request_pickup.png) | ![Profile](screenshots/user/profile.png) |
+| *User home with eco tips, statistics, waste categories, and recycling information* | *Schedule waste collection with waste type, quantity, date/time, and location picker* | *User profile with account info, contact details, and activity statistics* |
 
-| Profile | Settings | Notifications |
-|:---:|:---:|:---:|
-| <img src="screenshots/user/profile.png" width="200"> | <img src="screenshots/user/settings.png" width="200"> | <img src="screenshots/user/notifications.png" width="200"> |
+#### Settings & Account
 
-| Help & Support | EcoBot Chat | About |
+| Settings | Activity & Rewards | About |
 |:---:|:---:|:---:|
-| <img src="screenshots/user/help.png" width="200"> | <img src="screenshots/user/chatbot.png" width="200"> | <img src="screenshots/user/about.png" width="200"> |
+| ![Settings](screenshots/user/settings.png) | ![Activity Stats](screenshots/user/activity_stats.png) | Coming Soon |
+| *App preferences: dark mode, notifications, location services, and support options* | *Track pickups, CO₂ saved, eco score, and rewards system (₹25-₹300 vouchers)* | *App information and version* |
+
+#### Key Features Shown:
+- 🎯 **Eco Tip of the Day** - Daily waste management tips
+- 📊 **Live Statistics** - Track Pending, Active, and Completed pickups
+- ♻️ **Waste Categories** - Organic, Recyclable, and E-Waste sorting
+- 🎓 **Recycling Education** - Visual process guides (Collect → Sort → Compost → Fertilizer)
+- 🏆 **Eco Rewards** - 4-tier reward system:
+  - Eco Starter (20 pts): ₹25 Grocery Voucher
+  - Green Champion (50 pts): ₹75 Shopping Coupon
+  - Eco Warrior (100 pts): ₹150 Home Essentials Kit
+  - Earth Guardian (200 pts): ₹300 + Free Month Service
+- 🌿 **Environmental Impact** - Track CO₂ saved and eco score
+- 📍 **Smart Location** - Use profile address or pick from map
 
 ---
 
