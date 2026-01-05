@@ -149,10 +149,63 @@ git commit -m "Add user interface screenshots"
 git push origin main
 ```
 
+### 8. **how_recycling_works.png**
+Dedicated "How Recycling Works" screen showing:
+- Full recycling process visualization
+- Organic Waste process with complete flow:
+  - Collect → Sort → Compost → Fertilizer
+- Result card with tractor icon:
+  - "Organic Fertilizer"
+  - "Food scraps and garden waste become nutrient-rich compost for farming"
+- Carousel indicators showing multiple waste types
+- "Learn More" button
+
+### 9. **notifications.png**
+Notifications screen displaying:
+- Header: "Notifications - 0 unread"
+- Tabs: "Unread" (active) and "All"
+- Empty state with notification icon
+- Message: "No unread notifications"
+
+### 10. **activity_stats.png** (Alternative: Eco Rewards Focus)
+User rewards and activity tracking showing:
+- Eco Rewards section with:
+  - Next Reward: ₹25 Grocery Voucher (0 pts)
+  - 20 points required to unlock
+  - Progress bar visualization
+- Reward Tiers:
+  - Eco Starter (20 pts): ₹25 Grocery Voucher
+  - Green Champion (50 pts): ₹75 Shopping Coupon
+  - Eco Warrior (100 pts): ₹150 Home Essentials Kit
+  - Earth Guardian (200 pts): ₹300 + Free Month Service
+- Info: "How to earn points? Earn 10 points per pickup + bonus 5 points for every 5 pickups!"
+- Member since: Dec 2025
+
+## File Naming Convention
+
+```
+home_dashboard.png
+home_scrolled.png
+how_recycling_works.png
+profile.png
+activity_stats.png
+settings.png
+settings_support.png
+notifications.png
+request_pickup.png
+```
+
+## Image Specifications
+
+- **Format**: PNG
+- **Resolution**: 1170 x 2532 pixels (iPhone screenshots)
+- **Quality**: High quality, retina display
+- **Background**: Actual app screenshots
+- **Status Bar**: Include with time, signal, battery
+
 ## Current Status
 
-📱 **Screenshots Captured**: 7 screens
-📝 **Documentation**: Complete
-⏳ **Pending**: Adding actual PNG files to repository
-
-Once added, these will appear in the main README.md
+✅ **Screenshots Captured**: 9 screens
+✅ **Files Added**: home_dashboard.png, home_scrolled.png, how_recycling_works.png, profile.png, activity_stats.png, settings.png, settings_support.png, notifications.png, request_pickup.png
+✅ **Documentation**: Updated and complete
+✅ **Ready for Push**: Committed to git
