@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Waste Collection App - System Flowchart</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; 
+            padding: 40px 20px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { 
+            text-align: center; 
+            color: white; 
+            margin-bottom: 40px;
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.2em; opacity: 0.9; }
+        
+        .flowchart { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 40px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .node { 
+            text-align: center; 
+            padding: 20px 30px; 
+            border-radius: 12px; 
+            margin: 10px auto;
+            font-weight: 600;
+            max-width: 300px;
+        }
+        
+        .title-node { 
+            background: linear-gradient(135deg, #00c853, #00e676); 
+            color: white; 
+            font-size: 1.3em;
+            padding: 25px 40px;
+            max-width: 100%;
+        }
+        
+        .process-node { 
+            background: #e3f2fd; 
+            border: 3px solid #2196f3; 
+            color: #1565c0;
+        }
+        
+        .decision-node { 
+            background: #fff3e0; 
+            border: 3px solid #ff9800; 
+            color: #e65100;
+        }
+        
+        .arrow { 
+            text-align: center; 
+            font-size: 2em; 
+            color: #666; 
+            margin: 5px 0;
+        }
+        
+        .roles-container { 
+            display: flex; 
+            justify-content: space-between; 
+            gap: 20px; 
+            margin: 30px 0;
+        }
+        
+        .role-box { 
+            flex: 1; 
+            border-radius: 15px; 
+            padding: 25px; 
+            text-align: center;
+        }
+        
+        .user-box { background: linear-gradient(135deg, #4caf50, #81c784); color: white; }
+        .collector-box { background: linear-gradient(135deg, #2196f3, #64b5f6); color: white; }
+        .admin-box { background: linear-gradient(135deg, #9c27b0, #ba68c8); color: white; }
+        
+        .role-box h3 { 
+            font-size: 1.4em; 
+            margin-bottom: 15px; 
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .role-box ul { 
+            list-style: none; 
+            text-align: left; 
+            font-size: 0.95em;
+        }
+        
+        .role-box li { 
+            padding: 8px 0; 
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .role-box li:last-child { border-bottom: none; }
+        
+        .firebase-node { 
+            background: linear-gradient(135deg, #ff9800, #ffb74d); 
+            color: white;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .firebase-node ul { 
+            list-style: none; 
+            text-align: left; 
+            margin-top: 15px;
+        }
+        
+        .firebase-node li { padding: 5px 0; }
+        
+        .abstract { 
+            background: #f5f5f5; 
+            padding: 30px; 
+            border-radius: 15px; 
+            margin-bottom: 30px;
+            border-left: 5px solid #4caf50;
+        }
+        
+        .abstract h2 { color: #2e7d32; margin-bottom: 15px; }
+        .abstract p { line-height: 1.8; color: #555; }
+        
+        .tech-stack { 
+            display: flex; 
+            justify-content: center; 
+            gap: 15px; 
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .tech-badge { 
+            background: #263238; 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 25px; 
+            font-size: 0.9em;
+        }
+        
+        @media print {
+            body { background: white; padding: 20px; }
+            .flowchart { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌱 Smart Waste Collection App</h1>
+            <p>System Architecture & Flowchart</p>
+        </div>
+        
+        <div class="flowchart">
+            <!-- Abstract Section -->
+            <div class="abstract">
+                <h2>📋 Project Abstract</h2>
+                <p>
+                    <strong>Smart Waste Collection App</strong> is a Flutter-based mobile application that digitizes and streamlines waste management through a three-tier user system. It solves problems of inefficient scheduling, lack of real-time tracking, poor user engagement, and communication gaps between stakeholders. The platform connects <strong>Users</strong> (request pickup), <strong>Collectors</strong> (fulfill requests), and <strong>Admins</strong> (manage system) with features like real-time tracking, eco-points rewards, and AI-powered assistance.
+                </p>
+            </div>
+
+            <!-- Flowchart -->
+            <div class="node title-node">
+                ♻️ SMART WASTE COLLECTION APP
+            </div>
+            
+            <div class="arrow">⬇️</div>
+            
+            <div class="node process-node">
+                📱 Splash Screen
+            </div>
+            
+            <div class="arrow">⬇️</div>
+            
+            <div class="node decision-node">
+                🔐 Authentication<br>
+                <small>(Phone OTP / Email Login)</small>
+            </div>
+            
+            <div class="arrow">⬇️</div>
+            
+            <div style="text-align: center; color: #666; margin: 20px 0;">
+                <strong>Role-Based Routing</strong>
+            </div>
+            
+            <!-- Three Roles -->
+            <div class="roles-container">
+                <div class="role-box user-box">
+                    <h3>👤 USER</h3>
+                    <ul>
+                        <li>📅 Schedule Pickup</li>
+                        <li>📍 Select Location</li>
+                        <li>📊 Track Status</li>
+                        <li>🏆 Earn Eco Points</li>
+                        <li>🎁 Redeem Rewards</li>
+                        <li>🤖 Chat with EcoBot</li>
+                        <li>🔔 Notifications</li>
+                    </ul>
+                </div>
+                
+                <div class="role-box collector-box">
+                    <h3>🚛 COLLECTOR</h3>
+                    <ul>
+                        <li>📋 View Assignments</li>
+                        <li>✅ Update Status</li>
+                        <li>🗺️ Navigate to User</li>
+                        <li>✔️ Complete Pickup</li>
+                        <li>📈 Performance Stats</li>
+                        <li>🔔 Push Notifications</li>
+                    </ul>
+                </div>
+                
+                <div class="role-box admin-box">
+                    <h3>👨‍💼 ADMIN</h3>
+                    <ul>
+                        <li>📊 Dashboard</li>
+                        <li>👥 User Management</li>
+                        <li>🚚 Pickup Oversight</li>
+                        <li>📈 Analytics</li>
+                        <li>🎁 Reward Approvals</li>
+                        <li>⚙️ System Settings</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="arrow">⬇️</div>
+            
+            <div class="node firebase-node">
+                <strong>🔥 FIREBASE BACKEND</strong>
+                <ul>
+                    <li>🔐 Firebase Authentication</li>
+                    <li>🗄️ Cloud Firestore Database</li>
+                    <li>📨 Cloud Messaging (Push)</li>
+                </ul>
+            </div>
+            
+            <!-- Tech Stack -->
+            <div class="tech-stack">
+                <span class="tech-badge">Flutter</span>
+                <span class="tech-badge">Dart</span>
+                <span class="tech-badge">Firebase</span>
+                <span class="tech-badge">Provider</span>
+                <span class="tech-badge">iOS</span>
+                <span class="tech-badge">Android</span>
+                <span class="tech-badge">Web</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
