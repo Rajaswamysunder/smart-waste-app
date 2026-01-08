@@ -60,6 +60,9 @@ dependencies:
   latlong2: ^0.9.0
   geolocator: ^13.0.2
   shimmer: ^3.0.0
+  
+  # AI Features
+  http: ^1.2.0
 
 dev_dependencies:
   flutter_test:

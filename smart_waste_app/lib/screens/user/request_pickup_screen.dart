@@ -6,6 +6,7 @@ import '../../providers/user_provider.dart';
 import '../../services/pickup_service.dart';
 import '../../models/pickup_request.dart';
 import 'location_picker_screen.dart';
+import 'waste_scanner_screen.dart';
 
 class RequestPickupScreen extends StatefulWidget {
   const RequestPickupScreen({super.key});
@@ -161,6 +162,35 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
         _addressController.text = result['address'];
         _useProfileAddress = false;
       });
+    }
+  }
+
+  Future<void> _openAIScanner() async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const WasteScannerScreen(),
+      ),
+    );
+    
+    if (result != null && mounted) {
+      setState(() {
+        _selectedWasteType = result;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.auto_awesome, color: Colors.amber),
+              const SizedBox(width: 8),
+              Text('AI detected: $result waste'),
+            ],
+          ),
+          backgroundColor: AppTheme.primaryGreen,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      );
     }
   }
 
@@ -346,14 +376,56 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Waste Type Selection
-                      const Text(
-                        'Select Waste Type',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2D3436),
-                        ),
+                      // Waste Type Selection with AI Scanner
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Select Waste Type',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF2D3436),
+                            ),
+                          ),
+                          // AI Scanner Button
+                          GestureDetector(
+                            onTap: _openAIScanner,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF667eea).withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.camera_alt, color: Colors.white, size: 18),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    'AI Scan',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  SizedBox(width: 4),
+                                  Icon(Icons.auto_awesome, color: Colors.amber, size: 14),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 12),
                       SizedBox(

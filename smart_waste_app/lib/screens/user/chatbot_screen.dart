@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../utils/app_theme.dart';
+import '../../services/ai_service.dart';
 
 class ChatMessage {
   final String text;
@@ -30,13 +31,16 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   void initState() {
     super.initState();
     // Send welcome message
+    final aiStatus = AIService.isOpenAIConfigured ? '🤖 AI-Powered' : '💬 Smart Assistant';
     _addBotMessage(
       "Hello! 👋 I'm EcoBot, your Smart Waste Collection assistant.\n\n"
+      "$aiStatus\n\n"
       "I can help you with:\n"
       "• Scheduling pickups\n"
       "• Tracking your requests\n"
       "• Eco Points & rewards\n"
       "• Waste types & recycling\n"
+      "• 📸 AI Waste Scanner\n"
       "• Account issues\n\n"
       "How can I help you today?",
     );
@@ -231,7 +235,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
         "Or type 'help' for more options!";
   }
 
-  void _sendMessage() {
+  void _sendMessage() async {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
@@ -243,14 +247,23 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     _messageController.clear();
     _scrollToBottom();
 
-    // Simulate bot typing delay
-    Future.delayed(const Duration(milliseconds: 800), () {
-      final response = _getBotResponse(text);
-      setState(() {
-        _isTyping = false;
-      });
-      _addBotMessage(response);
-    });
+    // Get AI response
+    try {
+      final response = await AIService.getChatResponse(text);
+      if (mounted) {
+        setState(() {
+          _isTyping = false;
+        });
+        _addBotMessage(response);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isTyping = false;
+        });
+        _addBotMessage("Sorry, I'm having trouble connecting. Please try again! 🔄");
+      }
+    }
   }
 
   @override
