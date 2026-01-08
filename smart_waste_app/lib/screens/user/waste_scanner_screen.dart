@@ -226,7 +226,7 @@ class _WasteScannerScreenState extends State<WasteScannerScreen>
                   gradient: LinearGradient(
                     colors: [
                       AppTheme.primaryGreen.withOpacity(0.1),
-                      AppTheme.secondaryGreen.withOpacity(0.1),
+                      AppTheme.lightGreen.withOpacity(0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(16),
@@ -400,7 +400,7 @@ class _WasteScannerScreenState extends State<WasteScannerScreen>
                     child: _ActionButton(
                       icon: Icons.photo_library,
                       label: 'Gallery',
-                      color: AppTheme.secondaryGreen,
+                      color: AppTheme.lightGreen,
                       onPressed: () => _pickImage(ImageSource.gallery),
                     ),
                   ),

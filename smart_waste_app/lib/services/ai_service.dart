@@ -9,13 +9,15 @@ import 'package:flutter/foundation.dart';
 class AIService {
   // TODO: Replace with your actual API key
   // Get your API key from: https://platform.openai.com/api-keys
-  static const String _openAIApiKey = 'YOUR_OPENAI_API_KEY';
+  // IMPORTANT: Never commit API keys to version control!
+  // Use environment variables or a .env file instead
+  static const String _openAIApiKey = String.fromEnvironment('OPENAI_API_KEY', defaultValue: '');
   
   // OpenAI API endpoint
   static const String _openAIEndpoint = 'https://api.openai.com/v1/chat/completions';
 
   /// Check if OpenAI is configured
-  static bool get isOpenAIConfigured => _openAIApiKey != 'YOUR_OPENAI_API_KEY' && _openAIApiKey.isNotEmpty;
+  static bool get isOpenAIConfigured => _openAIApiKey.isNotEmpty;
 
   /// Get AI response from OpenAI GPT
   /// Falls back to rule-based responses if API key is not configured
