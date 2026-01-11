@@ -1,15 +1,16 @@
-# 🌱 Smart Waste Collection App
+# 🌱 Eco Waste - Smart Waste Collection App
 
 <p align="center">
-  <img src="assets/icon/app_icon.png" alt="Smart Waste App Logo" width="120" height="120">
+  <img src="assets/icon/app_icon.png" alt="Eco Waste App Logo" width="120" height="120">
 </p>
 
 <p align="center">
-  <strong>A comprehensive mobile application for smart waste management</strong>
+  <strong>AI-Powered Smart Waste Management with 6 Custom ML Implementations</strong>
 </p>
 
 <p align="center">
   <a href="#features">Features</a> •
+  <a href="#ai-features">AI Features</a> •
   <a href="#screenshots">Screenshots</a> •
   <a href="#tech-stack">Tech Stack</a> •
   <a href="#installation">Installation</a> •
@@ -20,6 +21,7 @@
   <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter">
   <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart">
   <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase">
+  <img src="https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white" alt="TensorFlow">
   <img src="https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white" alt="iOS">
   <img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android">
 </p>
@@ -28,14 +30,124 @@
 
 ## 📖 About The Project
 
-**Smart Waste Collection App** is a full-featured mobile application designed to revolutionize waste management. It connects users who need waste pickup services with collectors, all managed through an admin dashboard. The app promotes eco-friendly practices through a reward system and provides real-time tracking of waste collection.
+**Eco Waste** is a full-featured mobile application designed to revolutionize waste management using **Artificial Intelligence and Machine Learning**. It connects users who need waste pickup services with collectors, all managed through an admin dashboard. The app features **6 custom AI/ML implementations** for waste classification, prediction, and environmental impact analysis.
 
 ### 🎯 Problem It Solves
 
 - **Inefficient Waste Collection**: Traditional waste collection lacks scheduling and tracking
+- **Improper Waste Sorting**: Users don't know how to classify different types of waste
 - **No User Engagement**: Users have no incentive to properly dispose of waste
+- **Environmental Ignorance**: Lack of awareness about waste decomposition and impact
 - **Poor Communication**: No direct communication between users and collectors
-- **Lack of Transparency**: No visibility into pickup status or collector location
+
+---
+
+## 🤖 AI/ML Features
+
+Our app implements **6 custom AI/ML algorithms** without relying on external APIs:
+
+### 1. 🎯 Waste Classifier (Computer Vision)
+**File:** `lib/services/ml/tflite_classifier_service.dart`
+
+| Feature | Description |
+|---------|-------------|
+| **Algorithm** | HSV Color Analysis + Texture Detection |
+| **Skin Detection** | RGB + YCbCr + HSV voting system (prevents classifying humans as waste) |
+| **Categories** | Plastic, Paper, Glass, Metal, Organic, E-Waste, Textile, Medical |
+| **Output** | Waste type, confidence score, disposal recommendations |
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Image     │ ──► │  HSV + RGB  │ ──► │   Waste     │
+│   Input     │     │  Analysis   │     │   Type      │
+└─────────────┘     └─────────────┘     └─────────────┘
+                           │
+                    ┌──────▼──────┐
+                    │ Skin Check  │ ──► Human detected? Skip!
+                    └─────────────┘
+```
+
+### 2. 💬 NLP Chatbot
+**File:** `lib/services/ml/chatbot_service.dart`
+
+| Feature | Description |
+|---------|-------------|
+| **Algorithm** | Pattern-based Intent Classification |
+| **Knowledge Base** | 200+ Q&A pairs covering waste management |
+| **Intents** | Greetings, Recycling, Scheduling, Rewards, Complaints |
+| **Response** | Context-aware answers with eco-tips |
+
+### 3. 📊 Predictive Analytics
+**File:** `lib/services/ml/predictive_analytics_service.dart`
+
+| Feature | Description |
+|---------|-------------|
+| **Algorithm** | Exponential Smoothing + Linear Regression |
+| **Data Source** | Real Firestore pickup data |
+| **Predictions** | 7-day waste volume forecasts |
+| **Insights** | Peak days, waste trends, collection patterns |
+
+```
+Historical Data → Exponential Smoothing → Trend Analysis → 7-Day Forecast
+     │                    │                    │
+     └──────────────────────────────────────────┘
+                         │
+              ┌──────────▼──────────┐
+              │  Confidence Score   │
+              │  Peak Day Detection │
+              └─────────────────────┘
+```
+
+### 4. 🔍 Multi-Object Detection
+**File:** `lib/services/ml/multi_object_detection_service.dart`
+
+| Feature | Description |
+|---------|-------------|
+| **Algorithm** | 7×7 Grid Region Analysis + NMS |
+| **Filtering** | Skin tone & background detection |
+| **Output** | Multiple waste items with bounding boxes |
+| **Confidence** | Per-region scoring with threshold (0.55) |
+
+### 5. 🗑️ Bin Fill Level Detector
+**File:** `lib/services/ml/bin_fill_detector_service.dart`
+
+| Feature | Description |
+|---------|-------------|
+| **Algorithm** | Vertical Region Analysis + Edge Density |
+| **Process** | Divides image into 10 horizontal strips |
+| **Output** | Fill percentage (0-100%), pickup recommendations |
+| **Use Case** | Smart scheduling based on bin capacity |
+
+```
+┌─────────┐
+│ Strip 1 │ ← Low activity = Empty
+│ Strip 2 │ ← Low activity = Empty  
+│ Strip 3 │ ← Content starts here ↓
+│ Strip 4 │ █████ 
+│ Strip 5 │ ███████
+│ ...     │
+└─────────┘
+Result: 70% Full (3 empty / 10 total)
+```
+
+### 6. 🌱 Eco Impact Calculator
+**Files:** `lib/services/ml/decomposition_predictor_service.dart`, `lib/services/ml/carbon_footprint_service.dart`
+
+| Feature | Description |
+|---------|-------------|
+| **Decomposition DB** | 20+ waste types with scientific data |
+| **Carbon Tracking** | CO₂ saved, energy savings, water savings |
+| **Eco Score** | Gamified ranking system (0-100) |
+| **Insights** | Trees equivalent, car miles avoided |
+
+**Sample Decomposition Data:**
+| Waste Type | Decomposition Time | Environmental Impact |
+|------------|-------------------|---------------------|
+| Plastic Bottle | 450 years | 🔴 Very High |
+| Banana Peel | 2-5 weeks | 🟢 Very Low |
+| Glass Bottle | 1 million years | 🟡 Medium (recyclable) |
+| Battery | 100+ years | ⛔ Extreme (hazardous) |
+| Styrofoam | 500+ years | ⛔ Never fully decomposes |
 
 ---
 
@@ -48,7 +160,7 @@
 - 🏆 **Eco Points** - Earn rewards for recycling
 - 🎁 **Redeem Rewards** - Convert eco points to vouchers
 - 🔔 **Notifications** - Get updates on pickup status
-- 🤖 **EcoBot Assistant** - AI chatbot for instant support
+- 🤖 **AI Features** - 6 ML-powered tools for waste management
 - 🌙 **Dark Mode** - Eye-friendly dark theme
 
 ### 🚛 For Collectors
@@ -65,6 +177,28 @@
 - 📈 **Analytics** - View system statistics
 - 🎁 **Reward Approvals** - Approve reward redemption requests
 - ⚙️ **System Settings** - Configure app settings
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **Flutter** 3.7.2+ - Cross-platform UI framework
+- **Dart** - Programming language
+- **fl_chart** - Beautiful charts for analytics
+
+### Backend & Database
+- **Firebase Firestore** - Real-time NoSQL database
+- **Firebase Auth** - Phone & Email authentication
+- **Firebase Storage** - Image storage
+- **Firebase Messaging** - Push notifications
+
+### AI/ML
+- **Custom Algorithms** - No external AI APIs
+- **Image Package** - Pixel-level image analysis
+- **HSV/RGB/YCbCr** - Color space analysis
+- **Exponential Smoothing** - Time series forecasting
+- **Linear Regression** - Trend prediction
 
 ---
 
@@ -92,9 +226,18 @@
 
 </div>
 
+### 🤖 AI Features Dashboard
 
+The AI Dashboard features a premium glass-morphism UI with 6 ML-powered tabs:
 
-### 📋 Screen Descriptions
+| Feature | Icon | Description |
+|---------|------|-------------|
+| Classifier | 🎯 | Take photo → Get waste type |
+| Chatbot | 💬 | Ask questions about waste |
+| Analytics | 📊 | View predictions & trends |
+| Detection | 🔍 | Detect multiple objects |
+| Bin Fill | 🗑️ | Estimate bin fill level |
+| Eco Impact | 🌱 | Check decomposition time |
 
 #### **Splash Screen** (`splash.png`)
 - **Theme**: Light with vibrant green gradient (#00FF88)
