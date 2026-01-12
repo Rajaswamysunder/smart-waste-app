@@ -69,6 +69,12 @@ dependencies:
   # No external ML dependencies required - all algorithms implemented in Dart
   fl_chart: ^0.69.0
   path_provider: ^2.1.2
+  
+  # Image processing for AI features
+  image: ^4.2.0
+  
+  # TensorFlow Lite for on-device ML inference
+  tflite_flutter: ^0.12.0
 
 dev_dependencies:
   flutter_test:

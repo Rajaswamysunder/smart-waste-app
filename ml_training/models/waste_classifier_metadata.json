@@ -1,0 +1,27 @@
+{
+  "name": "Waste Classifier",
+  "version": "1.0.0",
+  "created": "2026-01-12T11:01:49.290439",
+  "input_size": 224,
+  "classes": [
+    "organic",
+    "recyclable",
+    "hazardous",
+    "ewaste",
+    "general"
+  ],
+  "description": "MobileNetV2-based waste classification model",
+  "preprocessing": {
+    "normalize": true,
+    "mean": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "std": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  }
+}

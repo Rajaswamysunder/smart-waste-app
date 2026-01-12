@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/ml/tflite_classifier_service.dart';
+import '../../services/ml/tflite_waste_classifier_service.dart';
 import '../../services/ml/chatbot_service.dart';
 import '../../services/ml/predictive_analytics_service.dart';
 import '../../services/ml/multi_object_detection_service.dart';
@@ -79,6 +80,7 @@ class _AIDashboardScreenState extends State<AIDashboardScreen>
   
   Future<void> _initializeServices() async {
     await TFLiteClassifierService.initialize();
+    await TFLiteWasteClassifierService.initialize();
     await MultiObjectDetectionService.initialize();
   }
   
@@ -412,7 +414,9 @@ class _ClassifierTab extends StatefulWidget {
 class _ClassifierTabState extends State<_ClassifierTab> with SingleTickerProviderStateMixin {
   File? _selectedImage;
   ClassificationResult? _result;
+  WasteClassificationResult? _tfliteResult;
   bool _isProcessing = false;
+  bool _useTFLiteModel = true; // Toggle between trained model and rule-based
   final ImagePicker _picker = ImagePicker();
   late AnimationController _animController;
   late Animation<double> _pulseAnimation;
@@ -448,15 +452,25 @@ class _ClassifierTabState extends State<_ClassifierTab> with SingleTickerProvide
         setState(() {
           _selectedImage = File(picked.path);
           _result = null;
+          _tfliteResult = null;
           _isProcessing = true;
         });
         
-        final result = await TFLiteClassifierService.classifyImage(picked.path);
-        
-        setState(() {
-          _result = result;
-          _isProcessing = false;
-        });
+        if (_useTFLiteModel && TFLiteWasteClassifierService.isInitialized) {
+          // Use trained TFLite model
+          final tfliteResult = await TFLiteWasteClassifierService.classifyImage(picked.path);
+          setState(() {
+            _tfliteResult = tfliteResult;
+            _isProcessing = false;
+          });
+        } else {
+          // Fall back to rule-based classifier
+          final result = await TFLiteClassifierService.classifyImage(picked.path);
+          setState(() {
+            _result = result;
+            _isProcessing = false;
+          });
+        }
       }
     } catch (e) {
       setState(() => _isProcessing = false);
@@ -605,14 +619,148 @@ class _ClassifierTabState extends State<_ClassifierTab> with SingleTickerProvide
                     ),
                   ],
                 ),
+                
+                // Model Selection Toggle
+                SizedBox(height: 16),
+                Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _useTFLiteModel ? Icons.auto_awesome : Icons.rule,
+                        color: Colors.white70,
+                        size: 20,
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          _useTFLiteModel ? 'AI Model (Trained)' : 'Rule-based',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Transform.scale(
+                        scale: 0.8,
+                        child: Switch(
+                          value: _useTFLiteModel,
+                          onChanged: TFLiteWasteClassifierService.isInitialized
+                              ? (value) {
+                                  setState(() {
+                                    _useTFLiteModel = value;
+                                    _result = null;
+                                    _tfliteResult = null;
+                                  });
+                                }
+                              : null,
+                          activeColor: Color(0xFF10B981),
+                          inactiveThumbColor: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
           
           SizedBox(height: 20),
           
-          // Results Section
-          if (_result != null) ...[
+          // Results Section - TFLite Model Result
+          if (_tfliteResult != null) ...[
+            // TFLite Main Result Card
+            _TFLiteResultCard(result: _tfliteResult!),
+            
+            SizedBox(height: 16),
+            
+            // All Predictions from TFLite
+            _GlassCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Color(0xFF10B981).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(Icons.auto_awesome, color: Color(0xFF10B981), size: 20),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'AI Model Predictions',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'MobileNetV2 • ${_tfliteResult!.processingTimeMs}ms',
+                              style: TextStyle(fontSize: 11, color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  ...(_tfliteResult!.allPredictions.entries.toList()
+                    ..sort((a, b) => b.value.compareTo(a.value)))
+                    .map((entry) => _AnimatedProgressBar(
+                      label: entry.key,
+                      value: entry.value,
+                      color: _getColorForLabel(entry.key),
+                    )),
+                ],
+              ),
+            ),
+            
+            // Disposal Tips
+            SizedBox(height: 16),
+            _GlassCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(_tfliteResult!.emoji, style: TextStyle(fontSize: 24)),
+                      SizedBox(width: 12),
+                      Text('Disposal Tip', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  SizedBox(height: 12),
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.black26 : Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      _tfliteResult!.disposalTip,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark ? Colors.white70 : Colors.black87,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          
+          // Results Section - Rule-based Result (fallback)
+          if (_result != null && _tfliteResult == null) ...[
             // Main Result Card
             _ResultCard(result: _result!),
             
@@ -841,6 +989,105 @@ class _ConfidenceBadge extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Result card for TFLite trained model
+class _TFLiteResultCard extends StatelessWidget {
+  final WasteClassificationResult result;
+  
+  const _TFLiteResultCard({required this.result});
+  
+  @override
+  Widget build(BuildContext context) {
+    final color = _getColorForLabel(result.label);
+    
+    return Container(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          // AI Badge
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: Color(0xFF10B981).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.auto_awesome, color: Color(0xFF10B981), size: 14),
+                SizedBox(width: 4),
+                Text(
+                  'Trained AI Model',
+                  style: TextStyle(
+                    color: Color(0xFF10B981),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 16),
+          Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              result.emoji,
+              style: TextStyle(fontSize: 36),
+            ),
+          ),
+          SizedBox(height: 16),
+          Text(
+            result.label,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _ConfidenceBadge(
+                label: result.confidencePercentage,
+                color: color,
+              ),
+              SizedBox(width: 8),
+              _ConfidenceBadge(
+                label: result.isHighConfidence ? 'High' : 'Medium',
+                color: result.isHighConfidence ? Colors.green : Colors.orange,
+                isOutline: true,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Color _getColorForLabel(String label) {
+    switch (label.toLowerCase()) {
+      case 'organic': return Color(0xFF10B981);
+      case 'recyclable': return Color(0xFF3B82F6);
+      case 'hazardous': return Color(0xFFEF4444);
+      case 'e-waste': return Color(0xFF8B5CF6);
+      default: return Color(0xFF6B7280);
+    }
   }
 }
 

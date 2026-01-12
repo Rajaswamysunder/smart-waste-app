@@ -22,33 +22,73 @@ class BinFillDetectorService {
     return true;
   }
 
-  /// Detect bin fill level from image
+  /// Detect bin fill level from image path (mobile/desktop)
   static Future<BinFillResult> detectFillLevel(String imagePath) async {
     if (!_isInitialized) await initialize();
 
     final stopwatch = Stopwatch()..start();
 
     try {
+      // Web platform check
+      if (kIsWeb) {
+        return BinFillResult(
+          fillPercentage: 0,
+          status: BinStatus.unknown,
+          analysisDetails: 'Please use detectFillLevelFromBytes for web platform',
+          processingTimeMs: stopwatch.elapsedMilliseconds,
+        );
+      }
+      
       final file = File(imagePath);
       if (!await file.exists()) {
         return BinFillResult(
           fillPercentage: 0,
           status: BinStatus.unknown,
-          analysisDetails: 'Image not found',
+          analysisDetails: 'Image not found at path: $imagePath',
           processingTimeMs: 0,
         );
       }
 
       final bytes = await file.readAsBytes();
+      return _processImageBytes(bytes, stopwatch);
+    } catch (e, stackTrace) {
+      stopwatch.stop();
+      if (kDebugMode) {
+        print('BinFillDetector Error: $e');
+        print('Stack trace: $stackTrace');
+      }
+      return BinFillResult(
+        fillPercentage: 0,
+        status: BinStatus.unknown,
+        analysisDetails: 'Error processing image: $e',
+        processingTimeMs: stopwatch.elapsedMilliseconds,
+      );
+    }
+  }
+
+  /// Detect bin fill level from image bytes (works on all platforms including web)
+  static Future<BinFillResult> detectFillLevelFromBytes(Uint8List bytes) async {
+    if (!_isInitialized) await initialize();
+    final stopwatch = Stopwatch()..start();
+    return _processImageBytes(bytes, stopwatch);
+  }
+
+  /// Process image bytes and return fill result
+  static Future<BinFillResult> _processImageBytes(Uint8List bytes, Stopwatch stopwatch) async {
+    try {
       final image = img.decodeImage(bytes);
 
       if (image == null) {
         return BinFillResult(
           fillPercentage: 0,
           status: BinStatus.unknown,
-          analysisDetails: 'Could not decode image',
+          analysisDetails: 'Could not decode image. Supported formats: JPEG, PNG, GIF, BMP, TIFF, WebP',
           processingTimeMs: stopwatch.elapsedMilliseconds,
         );
+      }
+
+      if (kDebugMode) {
+        print('BinFillDetector: Image decoded - ${image.width}x${image.height}');
       }
 
       // Resize for faster processing
@@ -59,6 +99,10 @@ class BinFillDetectorService {
       
       stopwatch.stop();
 
+      if (kDebugMode) {
+        print('BinFillDetector: Analysis complete - ${result.fillPercentage}% fill');
+      }
+
       return BinFillResult(
         fillPercentage: result.fillPercentage,
         status: _getStatus(result.fillPercentage),
@@ -68,18 +112,22 @@ class BinFillDetectorService {
         processingTimeMs: stopwatch.elapsedMilliseconds,
         recommendation: _getRecommendation(result.fillPercentage),
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
       stopwatch.stop();
+      if (kDebugMode) {
+        print('BinFillDetector Processing Error: $e');
+        print('Stack trace: $stackTrace');
+      }
       return BinFillResult(
         fillPercentage: 0,
         status: BinStatus.unknown,
-        analysisDetails: 'Error: $e',
+        analysisDetails: 'Error analyzing image: $e',
         processingTimeMs: stopwatch.elapsedMilliseconds,
       );
     }
   }
 
-  /// Analyze vertical fill using region-based approach
+  /// Analyze vertical fill using region-based approach with improved algorithm
   static Future<_FillAnalysis> _analyzeVerticalFill(img.Image image) async {
     final width = image.width;
     final height = image.height;
@@ -90,6 +138,21 @@ class BinFillDetectorService {
     
     List<double> stripDensities = [];
     List<double> stripEdgeCounts = [];
+    List<double> stripTextures = [];
+    
+    // Calculate global image statistics for normalization
+    double globalBrightnessSum = 0;
+    int totalPixels = 0;
+    
+    // First pass: calculate global statistics
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        final pixel = image.getPixel(x, y);
+        globalBrightnessSum += (pixel.r + pixel.g + pixel.b) / 3;
+        totalPixels++;
+      }
+    }
+    final globalMeanBrightness = globalBrightnessSum / totalPixels;
     
     // Analyze each strip
     for (int strip = 0; strip < numStrips; strip++) {
@@ -98,9 +161,11 @@ class BinFillDetectorService {
       
       double colorVariance = 0;
       double edgeCount = 0;
+      double textureScore = 0;
       int pixelCount = 0;
       
       List<int> hues = [];
+      List<double> brightnesses = [];
       
       for (int y = startY; y < endY; y++) {
         for (int x = 0; x < width; x++) {
@@ -113,68 +178,121 @@ class BinFillDetectorService {
           final hsv = _rgbToHsv(r, g, b);
           hues.add(hsv[0].toInt());
           
-          // Edge detection (simple gradient)
-          if (x > 0 && y > startY) {
+          // Calculate brightness
+          final brightness = (r + g + b) / 3.0;
+          brightnesses.add(brightness);
+          
+          // Edge detection (Sobel-like gradient)
+          if (x > 0 && y > startY && x < width - 1 && y < endY - 1) {
             final prevX = image.getPixel(x - 1, y);
+            final nextX = image.getPixel(x + 1, y);
             final prevY = image.getPixel(x, y - 1);
+            final nextY = image.getPixel(x, y + 1);
             
-            final gradX = (r - prevX.r.toInt()).abs() + 
-                          (g - prevX.g.toInt()).abs() + 
-                          (b - prevX.b.toInt()).abs();
-            final gradY = (r - prevY.r.toInt()).abs() + 
-                          (g - prevY.g.toInt()).abs() + 
-                          (b - prevY.b.toInt()).abs();
+            // Sobel gradient approximation
+            final gradX = ((nextX.r.toInt() - prevX.r.toInt()).abs() + 
+                          (nextX.g.toInt() - prevX.g.toInt()).abs() + 
+                          (nextX.b.toInt() - prevX.b.toInt()).abs()) / 3;
+            final gradY = ((nextY.r.toInt() - prevY.r.toInt()).abs() + 
+                          (nextY.g.toInt() - prevY.g.toInt()).abs() + 
+                          (nextY.b.toInt() - prevY.b.toInt()).abs()) / 3;
             
-            if (gradX > 50 || gradY > 50) {
+            final gradient = sqrt(gradX * gradX + gradY * gradY);
+            
+            if (gradient > 30) {
               edgeCount++;
+              textureScore += gradient;
             }
           }
           pixelCount++;
         }
       }
       
-      // Calculate variance in this strip
+      // Calculate variance in this strip (color variance)
       if (hues.isNotEmpty) {
         final avgHue = hues.reduce((a, b) => a + b) / hues.length;
         colorVariance = hues.map((h) => pow(h - avgHue, 2)).reduce((a, b) => a + b) / hues.length;
       }
       
-      stripDensities.add(colorVariance);
-      stripEdgeCounts.add(edgeCount / pixelCount);
+      // Calculate brightness variance (indicates content presence)
+      double brightnessVariance = 0;
+      if (brightnesses.isNotEmpty) {
+        final avgBrightness = brightnesses.reduce((a, b) => a + b) / brightnesses.length;
+        brightnessVariance = brightnesses.map((b) => pow(b - avgBrightness, 2)).reduce((a, b) => a + b) / brightnesses.length;
+      }
+      
+      stripDensities.add(colorVariance + brightnessVariance);
+      stripEdgeCounts.add(pixelCount > 0 ? edgeCount / pixelCount : 0);
+      stripTextures.add(pixelCount > 0 ? textureScore / pixelCount : 0);
+    }
+    
+    // Normalize strip values
+    final maxDensity = stripDensities.reduce(max);
+    final maxEdge = stripEdgeCounts.reduce(max);
+    final maxTexture = stripTextures.reduce(max);
+    
+    if (maxDensity > 0) {
+      stripDensities = stripDensities.map((d) => d / maxDensity).toList();
+    }
+    if (maxEdge > 0) {
+      stripEdgeCounts = stripEdgeCounts.map((e) => e / maxEdge).toList();
+    }
+    if (maxTexture > 0) {
+      stripTextures = stripTextures.map((t) => t / maxTexture).toList();
+    }
+    
+    // Combined score for each strip
+    List<double> combinedScores = [];
+    for (int i = 0; i < numStrips; i++) {
+      // Weight: edges 40%, texture 35%, color variance 25%
+      final score = stripEdgeCounts[i] * 0.4 + stripTextures[i] * 0.35 + stripDensities[i] * 0.25;
+      combinedScores.add(score);
     }
     
     // Find where content starts (from top)
-    // Empty bin top has low variance and few edges
+    // Empty bin top has low combined score
     int emptyStripsFromTop = 0;
-    final avgDensity = stripDensities.reduce((a, b) => a + b) / stripDensities.length;
-    final avgEdge = stripEdgeCounts.reduce((a, b) => a + b) / stripEdgeCounts.length;
+    final avgScore = combinedScores.reduce((a, b) => a + b) / combinedScores.length;
+    final threshold = avgScore * 0.4; // 40% of average is considered empty
     
     for (int i = 0; i < numStrips; i++) {
-      // If this strip has low activity, consider it empty
-      if (stripDensities[i] < avgDensity * 0.5 && stripEdgeCounts[i] < avgEdge * 0.5) {
+      if (combinedScores[i] < threshold) {
         emptyStripsFromTop++;
       } else {
         break; // Content starts here
       }
     }
     
-    // Calculate fill percentage
-    // If top 3 strips are empty → ~70% full
-    // If top 7 strips are empty → ~30% full
+    // Calculate fill percentage with smoothing
     final emptyRatio = emptyStripsFromTop / numStrips;
-    final fillPercentage = ((1 - emptyRatio) * 100).clamp(5.0, 100.0);
+    double fillPercentage = ((1 - emptyRatio) * 100);
+    
+    // Apply confidence adjustment based on overall texture
+    final avgTexture = stripTextures.reduce((a, b) => a + b) / stripTextures.length;
+    if (avgTexture < 0.2) {
+      // Low texture overall - might be mostly empty
+      fillPercentage = fillPercentage * 0.8;
+    }
+    
+    // Adjust based on global brightness (very dark or very bright images need adjustment)
+    if (globalMeanBrightness < 50 || globalMeanBrightness > 200) {
+      // Image might be poorly lit, reduce confidence slightly
+      fillPercentage = fillPercentage * 0.95;
+    }
+    
+    fillPercentage = fillPercentage.clamp(5.0, 100.0);
     
     // Calculate content density (how packed the content is)
-    final filledStrips = stripDensities.sublist(emptyStripsFromTop);
+    final filledStrips = combinedScores.sublist(emptyStripsFromTop);
     final contentDensity = filledStrips.isNotEmpty 
-        ? filledStrips.reduce((a, b) => a + b) / filledStrips.length / 1000
+        ? filledStrips.reduce((a, b) => a + b) / filledStrips.length
         : 0.0;
     
     return _FillAnalysis(
       fillPercentage: fillPercentage.roundToDouble(),
       emptySpaceRatio: emptyRatio,
       contentDensity: contentDensity.clamp(0.0, 1.0),
-      stripAnalysis: stripDensities,
+      stripAnalysis: combinedScores.map((s) => s * 100).toList(),
     );
   }
 

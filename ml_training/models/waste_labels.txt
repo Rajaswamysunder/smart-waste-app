@@ -1,0 +1,5 @@
+organic
+recyclable
+hazardous
+ewaste
+general
